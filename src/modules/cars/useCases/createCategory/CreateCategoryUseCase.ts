@@ -1,6 +1,6 @@
 // Services = Camada de mais alto nível.
 
-import { CategoriesRepository } from "../../repositories/implementations/CategoriesRepository";
+import { ICategoriesRepository } from "../../repositories/ICategoriesRepository";
 
 // Não deve depender de códigos que dependem de mais baixo nível.
 interface IRequest {
@@ -9,7 +9,7 @@ interface IRequest {
 }
 
 class CreateCategoryUseCase {
-    constructor(private categoriesRepository: CategoriesRepository) {}
+    constructor(private categoriesRepository: ICategoriesRepository) {}
 
     execute({description, name}: IRequest): void {
         const categoryAlreadyExists = this.categoriesRepository.findByName(name);

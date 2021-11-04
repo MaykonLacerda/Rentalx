@@ -1,22 +1,19 @@
 // Repositorio = Camada responsável por acesso ao banco de dados, cadastros, select e toda manipulação com banco de dados.
 // DTO = Data Transfer Object
 
-import { Category } from '../../model/Category'
+import { Category } from '../../entities/Category'
+import { ICategoriesRepository, ICreateCategoryDTO } from '../ICategoriesRepository';
 
+import { getRepository, Repository } from 'typeorm';
 
-interface ICreateCategoryDTO {
-    name: string;
-    description: string;
-}
+class CategoriesRepository implements ICategoriesRepository {
 
-class CategoriesRepository {
-
-    private categories: Category[];
+    private repository: Repository<Category>;
 
     private static INSTANCE: CategoriesRepository;
 
     private constructor() {
-        this.categories = [];
+        this.repository = getRepository(Category);
     }
 
     public static getInstance(): CategoriesRepository {
@@ -28,24 +25,22 @@ class CategoriesRepository {
         return CategoriesRepository.INSTANCE;
     }
 
-    create({ name, description } : ICreateCategoryDTO): void  {  // "void" = não possui retorno
-        const category = new Category();
-
-        Object.assign(category, { //atribuindo item por item para o category 
-            name,
-            description,
-            created_at: new Date()
+    async create({ name, description } : ICreateCategoryDTO): Promise<void>  {  // "void" = não possui retorno
+        const category = this.repository.create({ 
+            name, 
+            description 
         })
 
-        this.categories.push(category);
+        await this.repository.save(category)
     }
 
-    list(): Category[] {
-        return this.categories;
+    async list(): Promise<Category[]> {
+        const categories = await this.repository.find();
+        return categories;
     }
 
-    findByName(name: string): Category {
-        const category = this.categories.find(category => category.name === name);
+    async findByName(name: string): Promise<Category> {
+        const category = await this.repository.findOne({ name });
         return category;
     }
 }
