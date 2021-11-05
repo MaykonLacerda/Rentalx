@@ -1,5 +1,6 @@
 // Services = Camada de mais alto nível.
-import { inject, injectable} from "tsyringe";
+import { inject, injectable } from "tsyringe";
+import { AppError } from "../../../../errors/AppError";
 
 import { ICategoriesRepository } from "../../repositories/ICategoriesRepository";
 
@@ -12,13 +13,13 @@ interface IRequest {
 @injectable()
 class CreateCategoryUseCase {
     constructor(@inject("CategoriesRepository")
-    private categoriesRepository: ICategoriesRepository) {}
+    private categoriesRepository: ICategoriesRepository) { }
 
-    async execute({description, name}: IRequest): Promise<void> {
+    async execute({ description, name }: IRequest): Promise<void> {
         const categoryAlreadyExists = await this.categoriesRepository.findByName(name);
 
         if (categoryAlreadyExists) {
-            throw new Error("Category already exists!"); //throw: Nativo do JS
+            throw new AppError("Category already exists!"); //throw: Nativo do JS
         }
 
         this.categoriesRepository.create({ name, description });
